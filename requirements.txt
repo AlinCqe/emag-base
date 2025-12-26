@@ -1,0 +1,6 @@
+gspread
+google-auth
+beautifulsoup4
+python-dotenv
+fastapi
+pydanti
