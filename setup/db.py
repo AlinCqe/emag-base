@@ -1,13 +1,23 @@
 import gspread
 from google.oauth2.service_account import Credentials
+import json
+from dotenv import load_dotenv
+import os
 
-SERVICE_ACCOUNT_FILE = "service_account.json"
+load_dotenv()
 
+creds_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+
+if not creds_json:
+    raise RuntimeError("Missing GOOGLE_SERVICE_ACCOUNT_JSON env var")
+
+creds_dict = json.loads(creds_json)
+print(creds_dict)
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
-creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 client = gspread.authorize(creds)
 sheet = client.open("links").sheet1
 
@@ -33,3 +43,6 @@ def col_index():
     data=sheet.get_all_records()
     headers = list(data[0].keys()) 
     col_index = {name: idx + 1 for idx, name in enumerate(headers)}
+
+
+print(get_db_data())
