@@ -58,4 +58,3 @@ def get_imgs_from_link(url):
     return links
 
 
-print(get_imgs_from_link("https://www.emag.ro/bol-hrana-animale-nextly-hranire-lenta-material-sigur-abs-usor-de-curatat-roz-bol-hrana-mod-r/pd/DVZ4Z63BM/"))

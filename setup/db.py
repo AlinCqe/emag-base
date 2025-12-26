@@ -12,7 +12,7 @@ if not creds_json:
     raise RuntimeError("Missing GOOGLE_SERVICE_ACCOUNT_JSON env var")
 
 creds_dict = json.loads(creds_json)
-print(creds_dict)
+
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
@@ -45,4 +45,3 @@ def col_index():
     col_index = {name: idx + 1 for idx, name in enumerate(headers)}
 
 
-print(get_db_data())

@@ -73,4 +73,3 @@ def write_id():
     print("total: ", total_count)
     print("writes: ", writes_count)
 
-write_id()
