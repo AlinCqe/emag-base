@@ -37,4 +37,4 @@ def update_images(item: ItemRequest):
     
     logger.info(f"Images: {imgs}")
     response = update_images_base(invetory_id=1, item_id=item.id, images=imgs)
-    return response
+    return {"status": "ok"}
