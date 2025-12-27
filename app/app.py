@@ -17,8 +17,9 @@ class ItemRequest(BaseModel):
 @app.post("/UpdateImages")
 def update_images(item: ItemRequest):
     logger.info(f"Received item: {item}")
-    link = get_link_from_id(str(item.id))
-
+    print(item.id)
+    link = get_link_from_id(item.id)
+    print(link)
     if not link:
         raise HTTPException(
             status_code=404,
@@ -29,7 +30,7 @@ def update_images(item: ItemRequest):
     imgs = get_imgs_from_link(link)
 
     if not imgs:
-        raise HTTPException(
+       raise HTTPException(
             status_code=404,
             detail=f"No images found for item id {item.id}, link: {link}"
         )

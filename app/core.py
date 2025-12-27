@@ -16,6 +16,7 @@ def get_link_from_id(item_id: str) -> str:
     data = get_db_data()
 
     for row in data:
+        print(row)
         if row["item_id"] == item_id:
             return row["link"]
     return None
