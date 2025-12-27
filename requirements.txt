@@ -1,7 +1,7 @@
-gspread
-google-auth
-beautifulsoup4
-python-dotenv
-fastapi
-pydantic
-uvicorn
+gspread==6.2.1
+google-auth==2.41.1
+beautifulsoup4==4.13.5
+python-dotenv==1.2.1
+fastapi==0.127.1
+pydantic==2.12.4
+uvicorn==0.40.0

@@ -83,7 +83,7 @@ def daily_grab_links():
     sheets_sku = get_dbs_sku()
     print(f"SKU in sheet: {len(sheets_sku)}")
 
-    for i in range(8,25):
+    for i in range(1,3):
         bulk_items = []
 
         link = f"https://www.emag.ro/brands/brand/nextly/sort-offer_iddesc/p{i}"
@@ -102,14 +102,14 @@ def daily_grab_links():
             print("Bad status code", response.status_code)
         
         print(f"Bulk items: {len(bulk_items)}")
-        time.sleep(5)
+        time.sleep(10)
         for item in bulk_items:
             sku = grab_sku(item["link"])
 
             if sku:
                 item["sku"] = sku
 
-            time.sleep(random.randint(2,5))
+            time.sleep(random.randint(3,6))
 
         count=0    
         for item in bulk_items:
@@ -123,4 +123,3 @@ def daily_grab_links():
 
 
 daily_grab_links()
-#safe exit of no sku

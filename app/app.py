@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from .core import get_imgs_from_link, update_images_base, get_link_from_id
 app = FastAPI()
@@ -10,7 +10,24 @@ class ItemRequest(BaseModel):
 
 @app.post("/UpdateImages")
 def update_images(item: ItemRequest):
+
     link = get_link_from_id(str(item.id))
-    if link:
-        images = get_imgs_from_link(link)
-        return images
+
+    if not link:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No link found for item id {item.id}"
+        )
+    
+
+    imgs = get_imgs_from_link(link)
+
+    if not imgs:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No images found for item id {item.id}, link: {link}"
+        )
+    
+
+    response = update_images_base(invetory_id=1, item_id=item.id, images=imgs)
+    return response
