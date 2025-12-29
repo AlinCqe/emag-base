@@ -3,7 +3,9 @@ import json
 from setup.db import get_db_data, update_cell
 from dotenv import load_dotenv
 import os
+import logging
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 load_dotenv()
 
 XBLToken = os.getenv("XBLToken")
