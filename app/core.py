@@ -12,12 +12,12 @@ headers ={"X-BLToken": XBLToken}
 
 
 
-def get_link_from_id(item_id: str) -> str:
+def get_link_from_sku(sku: str) -> str:
     data = get_db_data()
 
     for row in data:
         print(row)
-        if row["item_id"] == item_id:
+        if row["sku"] == sku:
             return row["link"]
     return None
 
