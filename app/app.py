@@ -14,16 +14,16 @@ class ItemRequest(BaseModel):
     inventory_id: int
 
 
-@app.post("/UpdateImages")
-def update_images(item: ItemRequest):
-    logger.info(f"Received item: {item}")
-    print(item.id)
-    link = get_link_from_id(item.id)
+@app.get("/UpdateImages")
+def update_images(id:str, sku:str, inventory_id:str):
+    logger.info(f"Received item: {sku}")
+    print(id)
+    link = get_link_from_id(id)
     print(link)
     if not link:
         raise HTTPException(
             status_code=404,
-            detail=f"No link found for item id {item.id}"
+            detail=f"No link found for item id {id}"
         )
     
     logger.info(f"Link: {link}")
@@ -32,9 +32,9 @@ def update_images(item: ItemRequest):
     if not imgs:
        raise HTTPException(
             status_code=404,
-            detail=f"No images found for item id {item.id}, link: {link}"
+            detail=f"No images found for item id {id}, link: {link}"
         )
     
     logger.info(f"Images: {imgs}")
-    response = update_images_base(invetory_id=1, item_id=item.id, images=imgs)
+    update_images_base(invetory_id=1, item_id=id, images=imgs)
     return {"status": "ok"}
