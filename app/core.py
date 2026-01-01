@@ -64,11 +64,15 @@ def update_images_base(inventory_id: str, item_id: str, images: dict):
 
 
 def get_imgs_from_link(url):        
+    session = requests.Session()
+    session.headers.update(SCRAPING_HEADERS)
     links = []
     formated_links={}
 
     try:
-        response = requests.get(url, headers=SCRAPING_HEADERS)
+        response = session.get(url, headers=SCRAPING_HEADERS)
+        logging.info(f"Headres: {SCRAPING_HEADERS}")
+
     except Exception as e:
         logging.error(f"Something went wrong with the requesto to {url}:\n{e}")
         return None
