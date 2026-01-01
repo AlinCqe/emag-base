@@ -13,6 +13,16 @@ load_dotenv()
 XBLToken = os.getenv("XBLToken")
 headers ={"X-BLToken": XBLToken}
 
+SCRAPING_HEADERS = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8,es;q=0.7,ro;q=0.6',
+            'Referer': 'https://google.ro/',
+            'DNT': '1',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+    }
+
 
 
 def get_link_from_sku(sku: str) -> str:
@@ -58,7 +68,7 @@ def get_imgs_from_link(url):
     formated_links={}
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=SCRAPING_HEADERS)
     except Exception as e:
         logging.error(f"Something went wrong with the requesto to {url}:\n{e}")
         return None
