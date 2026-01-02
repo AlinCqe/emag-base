@@ -36,5 +36,5 @@ def update_images(id:str, sku:str, inventory_id:str):
         )
     
     logger.info(f"Images: {imgs}")
-    update_images_base(inventory_id=86148, item_id=id, images=imgs)
+    update_images_base(inventory_id=inventory_id, item_id=id, inventory_id=inventory_id, images=imgs)
     return {"status": "ok"}
