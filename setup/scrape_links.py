@@ -2,7 +2,7 @@ import requests
 import random
 from bs4 import BeautifulSoup
 import time
-from db import get_db_data, update_cell, sheet
+from .db import get_db_data, update_cell, sheet
 signs = [':', '*', '?', '"', '<', '>', '|']
 
     
@@ -78,9 +78,19 @@ def get_dbs_sku() -> list:
     return sheets_sku
 
 
+def get_dbs_links() -> list:
+    
+    sheet_data = get_db_data()
+    sheets_links = [row["link"] for row in sheet_data if row["link"] != ""]
+
+
+    return sheets_links
+
+
     
 def daily_grab_links():
     sheets_sku = get_dbs_sku()
+    sheets_links = get_dbs_links()
     print(f"SKU in sheet: {len(sheets_sku)}")
 
     for i in range(1,3):
@@ -102,8 +112,13 @@ def daily_grab_links():
             print("Bad status code", response.status_code)
         
         print(f"Bulk items: {len(bulk_items)}")
+
+        new_bulk_items = [item for item in bulk_items if item["link"] not in sheets_links]
+
+        print(f"Bulk items after links clean up: {len(new_bulk_items)}.\n{new_bulk_items}")
+
         time.sleep(10)
-        for item in bulk_items:
+        for item in new_bulk_items:
             sku = grab_sku(item["link"])
 
             if sku:
@@ -112,7 +127,7 @@ def daily_grab_links():
             time.sleep(random.randint(3,6))
 
         count=0    
-        for item in bulk_items:
+        for item in new_bulk_items:
         
             if item["sku"] not in sheets_sku and item["sku"] != None:
                 sheet.append_row([item["item_name"], item["link"], item["sku"]])
