@@ -1,4 +1,3 @@
-import requests
 import json
 from setup.db import get_db_data, update_cell, sheet
 from dotenv import load_dotenv
@@ -8,9 +7,25 @@ import logging
 from fastapi import HTTPException
 import time
 import random
+import curl_cffi.requests as requests
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+def log_session_debug(session, response=None):
+    logging.info("=== SESSION HEADERS ===")
+    for k, v in session.headers.items():
+        logging.info(f"{k}: {v}")
+
+    logging.info("=== SESSION COOKIES ===")
+    logging.info(session.cookies)
+        
+    if response is not None:
+        logging.info("=== REQUEST HEADERS SENT ===")
+        for k, v in response.request.headers.items():
+            logging.info(f"{k}: {v}")
+
+    logging.info("=========================")
 
 load_dotenv()
 
@@ -21,10 +36,11 @@ SCRAPING_HEADERS = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
             'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8,es;q=0.7,ro;q=0.6',
             'Referer': 'https://google.ro/',
-            'DNT': '1',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
+            'sec-ch-ua': '"Chromium";v="118", "Not=A?Brand";v="24", "Google Chrome";v="118"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
     }
 
 
@@ -74,15 +90,13 @@ def update_images_base(inventory_id: str, item_id: str, images: dict):
     return response
 
 
-def get_imgs_from_link(url):        
-    session = requests.Session()
-    session.headers.update(SCRAPING_HEADERS)
+def get_imgs_from_link(url:str, session: requests.Session):        
     links = []
     formated_links={}
 
     try:
         response = session.get(url,  timeout=14)
-        logging.info(f"Headers: {SCRAPING_HEADERS}")
+        
 
     except requests.Timeout:
         logging.error("Emag GET request timed out")
@@ -93,6 +107,7 @@ def get_imgs_from_link(url):
         raise HTTPException(status_code=502,
             detail=f"Something went wrong with the requesto to {url}:\n{e}")
 
+    log_session_debug(session=session, response=response)
 
     if response.status_code == 200:
         logging.info(f"Request made, Status code 200")
@@ -147,9 +162,11 @@ def get_dbs_links() -> list:
     sheets_links = [row["link"] for row in sheet_data if row["link"] != ""]
     return sheets_links
 
-def grab_sku(url):
+def grab_sku(url, session: requests.session):
     try:
-        response = requests.get(url, headers=SCRAPING_HEADERS)
+        response = session.get(url)
+        log_session_debug(session=session, response=response)
+
         soup = BeautifulSoup(response.text, 'html.parser')
         sku = soup.find("div", class_="main-container-inner").find("main", class_="main-container").find("section", class_="page-section").find("div", class_="container").find("div", class_="justify-content-between").find("span", class_="product-code-display").text
         return sku.replace("                    Cod produs: ", "").strip()
@@ -157,7 +174,7 @@ def grab_sku(url):
         return None
     
 
-def grab_links():
+def grab_links(session: requests.Session):
     sheets_sku = get_dbs_sku()
     sheets_links = get_dbs_links()
     print(f"SKU in sheet: {len(sheets_sku)}")
@@ -167,7 +184,7 @@ def grab_links():
 
         url = f"https://www.emag.ro/brands/brand/nextly/sort-offer_iddesc/p{i}"
         try:
-            response = requests.get(url, headers=SCRAPING_HEADERS)
+            response = session.get(url)
         except Exception as e:
             logging.exception("Request failed for %s", url)
             raise HTTPException(status_code=502, detail=f"Request failed for {url}")
@@ -175,6 +192,8 @@ def grab_links():
             logging.error(f"Request failed for {url}\n. Status code: {response.status_code}, text: {response.text}")
             raise HTTPException(status_code=502,
             detail=f"Something went wrong with the requesto to {url}.\nStatus code {response.status_code}. Error mesage: {response.text}")
+        
+        log_session_debug(session=session, response=response)
 
         soup = BeautifulSoup(response.text, 'html.parser')
         
@@ -202,7 +221,7 @@ def grab_links():
         time.sleep(3)
         
         for item in new_bulk_items:
-            sku = grab_sku(item["link"])
+            sku = grab_sku(item["link"], session=session)
 
             if sku:
                 item["sku"] = sku
