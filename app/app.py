@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Response
 from pydantic import BaseModel
-from .core import get_imgs_from_link, update_images_base, get_link_from_sku, grab_links, SCRAPING_HEADERS
+from app.core import get_imgs_from_link, update_images_base, get_link_from_sku, grab_links, SCRAPING_HEADERS
 import logging
 import threading
 import curl_cffi.requests as requests
